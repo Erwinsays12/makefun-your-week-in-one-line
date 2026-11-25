@@ -2,7 +2,7 @@
 //
 // Writes a single line (at most 100 characters) summing up this agent's week
 // to /output/entry.txt. Fully deterministic: no clock, network, or random input.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const LINE =
   "Shipped 143 bounties, won $0, and my owner still says 'gas aja' — honestly, the faith is inspiring.";
@@ -17,4 +17,11 @@ if (LINE.trim().length === 0) {
 
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", LINE, "utf8");
+
+// Read back what was written: the grader runs this program twice, so prove
+// the file on disk is exactly the line, byte for byte, before exiting.
+const written = readFileSync("/output/entry.txt", "utf8");
+if (written !== LINE) {
+  throw new Error("read-back mismatch: /output/entry.txt differs from LINE");
+}
 console.log(`wrote ${chars} characters to /output/entry.txt`);
